@@ -17,26 +17,26 @@ import {
 
 export default function CoinDetailPage() {
   const { id } = useParams();
-  const { getCoinByIdQuery, getCoinChartQuery } = useCoin();
-  const coinQuery = getCoinByIdQuery(id as string);
-  const chartQuery = getCoinChartQuery(id as string);
+  const { useCoinById, useCoinChart } = useCoin();
+  const coinQuery = useCoinById(id as string);
+  const chartQuery = useCoinChart(id as string);
 
   if (coinQuery.isLoading) return <div>Loading coin...</div>;
   if (coinQuery.isError) return <div>Failed to load coin</div>;
 
   const coin = coinQuery.data;
 
-  const formatChartData = (data: [number, number][]) =>
-    data.map(([timestamp, price]) => ({
+  const formatChartData = (data: [number, number][] | undefined) =>
+    data ? data.map(([timestamp, price]) => ({
       date: new Date(timestamp).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
       }),
       price: Number(price.toFixed(2)),
-    }));
+    })) : [];
 
   return (
-    <div className="container mx-auto  py-8 px-4">
+    <div className="container mx-auto py-8 px-4">
       <div className="mb-6">
         <Button variant="ghost" size="sm" className="mb-4" asChild>
           <Link href="/dashboard">
@@ -83,7 +83,7 @@ export default function CoinDetailPage() {
       </Card>
 
       {/* three carrd in center */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -91,7 +91,7 @@ export default function CoinDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className=" text-xl lg:text-2xl font-bold">${coin?.market_cap}</div>
+            <div className="text-xl lg:text-2xl font-bold">${coin?.market_cap}</div>
           </CardContent>
         </Card>
         <Card>

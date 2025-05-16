@@ -1,10 +1,9 @@
 "use client";
-import { useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchMarketCoins, fetchCoinById, fetchCoinMarketChart } from "@/services/coinService";
 import { Coin } from "@/types/coin";
 
 export const useCoin = () => {
-
   // Fetch all coins with auto refetch every 60 seconds
   const coinsQuery = useQuery({
     queryKey: ["market-coins"],
@@ -14,8 +13,8 @@ export const useCoin = () => {
     refetchOnWindowFocus: true,   
   });
 
- // Fetch a single coin by ID
-  const getCoinByIdQuery = (id: string | null) => {
+  // Function to create a hook for fetching coin by ID
+  const useCoinById = (id: string | null) => {
     return useQuery<Coin>({
       queryKey: ["coin", id],
       queryFn: async () => {
@@ -26,8 +25,8 @@ export const useCoin = () => {
     });
   };
 
-  // this function will get us the chart details
-  const getCoinChartQuery = (id: string | null) => {
+  // Function to create a hook for fetching coin chart
+  const useCoinChart = (id: string | null) => {
     return useQuery({
       queryKey: ["coin-chart", id],
       queryFn: async () => {
@@ -38,10 +37,9 @@ export const useCoin = () => {
     });
   };
 
-
   return {
     coinsQuery,
-    getCoinByIdQuery,
-    getCoinChartQuery
+    useCoinById,
+    useCoinChart
   };
 };

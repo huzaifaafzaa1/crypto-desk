@@ -1,6 +1,16 @@
 import API from "@/lib/axiosInstance";
 import { Coin } from "@/types/coin";
 
+// Define a proper error interface for API errors
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+}
+
 export const fetchMarketCoins = async (): Promise<Coin[]> => {
   try {
     const response = await API.get<Coin[]>("/coins/markets", {
@@ -13,8 +23,9 @@ export const fetchMarketCoins = async (): Promise<Coin[]> => {
       },
     });
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to fetch market coins");
+  } catch (error: unknown) {
+    const apiError = error as ApiError;
+    throw new Error(apiError.response?.data?.message || "Failed to fetch market coins");
   }
 };
 
@@ -32,13 +43,14 @@ export const fetchCoinById = async (id: string): Promise<Coin> => {
       throw new Error("Coin not found");
     }
     return response.data[0]; // return the first item (since it's an array)
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to fetch coin");
+  } catch (error: unknown) {
+    const apiError = error as ApiError;
+    throw new Error(apiError.response?.data?.message || "Failed to fetch coin");
   }
 };
 
 // fetchCoinMarketChart.ts
-export const fetchCoinMarketChart = async (id: string) => {
+export const fetchCoinMarketChart = async (id: string): Promise<Array<[number, number]>> => {
   try {
     const response = await API.get(`/coins/${id}/market_chart`, {
       params: {
@@ -48,8 +60,8 @@ export const fetchCoinMarketChart = async (id: string) => {
       },
     });
     return response.data.prices; // This returns an array: [ [timestamp, price], ... ]
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to fetch coin chart data");
+  } catch (error: unknown) {
+    const apiError = error as ApiError;
+    throw new Error(apiError.response?.data?.message || "Failed to fetch coin chart data");
   }
 };
-
